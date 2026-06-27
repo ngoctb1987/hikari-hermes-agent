@@ -203,11 +203,11 @@ def stop_profile_gateway() -> bool:
 
     try:
         os.kill(pid, signal.SIGTERM)
-    except ProcessLookupError:
-        pass  # Already gone
     except PermissionError:
         print(f"⚠ Permission denied to kill PID {pid}")
         return False
+    except OSError:
+        pass  # Already gone
 
     # Wait briefly for it to exit
     import time as _time
@@ -215,7 +215,7 @@ def stop_profile_gateway() -> bool:
         try:
             os.kill(pid, 0)
             _time.sleep(0.5)
-        except (ProcessLookupError, PermissionError):
+        except OSError:
             break
 
     remove_pid_file()

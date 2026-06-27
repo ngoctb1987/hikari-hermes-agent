@@ -639,16 +639,16 @@ def _stop_gateway_process(profile_dir: Path) -> None:
             _time.sleep(0.5)
             try:
                 os.kill(pid, 0)
-            except ProcessLookupError:
+            except OSError:
                 print(f"✓ Gateway stopped (PID {pid})")
                 return
         # Force kill
         try:
             os.kill(pid, _signal.SIGKILL)
-        except ProcessLookupError:
+        except OSError:
             pass
         print(f"✓ Gateway force-stopped (PID {pid})")
-    except (ProcessLookupError, PermissionError):
+    except OSError:
         print("✓ Gateway already stopped")
     except Exception as e:
         print(f"⚠ Could not stop gateway: {e}")

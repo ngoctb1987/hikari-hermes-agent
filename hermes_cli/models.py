@@ -28,6 +28,9 @@ GITHUB_MODELS_CATALOG_URL = COPILOT_MODELS_URL
 OPENROUTER_MODELS: list[tuple[str, str]] = [
     ("anthropic/claude-opus-4.6",       "recommended"),
     ("anthropic/claude-sonnet-4.6",     ""),
+    ("deepseek/deepseek-r1",            "reasoning"),
+    ("deepseek/deepseek-chat",          ""),
+    ("deepseek/deepseek-r1:free",       "free"),
     ("qwen/qwen3.6-plus:free", "free"),
     ("anthropic/claude-sonnet-4.5",     ""),
     ("anthropic/claude-haiku-4.5",      ""),
