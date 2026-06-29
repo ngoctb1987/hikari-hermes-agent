@@ -1,0 +1,47 @@
+# ==============================================================================
+# File: docker-compose.yml
+# Purpose: Mẫu cấu hình Docker Compose chuẩn hóa cho Hermes Agent & Dashboard.
+#          Giải quyết triệt để vấn đề kẹt lock file (gateway.pid) và lỗi binding
+#          khi chạy chế độ bảo mật trên VPS doanh nghiệp.
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  gateway:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      # Mount thư mục cấu hình và session trên host vào container
+      - /home/hikari/.hermes:/opt/data
+    environment:
+      # Khớp với UID/GID của user chạy trên host để không bị lỗi phân quyền
+      - HERMES_UID=1000
+      - HERMES_GID=1000
+      - TZ=Asia/Ho_Chi_Minh
+    # Xử lý tự động dọn dẹp các tệp tin khóa (gateway.pid, locks/*) trước khi khởi động
+    # để tránh việc bot không phản hồi sau khi restart container
+    command: >
+      bash -c "rm -f /opt/data/gateway.pid /opt/data/locks/* && exec hermes gateway run"
+
+  dashboard:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes-dashboard
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - gateway
+    volumes:
+      - /home/hikari/.hermes:/opt/data
+    environment:
+      - HERMES_UID=1000
+      - HERMES_GID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      # Đặt biến môi trường này nếu muốn tắt tính năng chặn binding bảo mật vào 0.0.0.0
+      # (Khuyên dùng khi có lớp Nginx bảo mật ở ngoài làm Proxy)
+      - HERMES_DASHBOARD_INSECURE=1
+    # Ghi đè entrypoint để chạy trực tiếp dashboard trên cổng 0.0.0.0, bỏ qua s6-overlay giúp không bị chạy trùng bot.
+    # Thêm `--insecure` để bỏ qua xác thực OAuth nếu truy cập qua Proxy nội bộ / Nginx
+    entrypoint: ["/opt/hermes/.venv/bin/hermes", "dashboard", "--host", "0.0.0.0", "--no-open", "--insecure"]

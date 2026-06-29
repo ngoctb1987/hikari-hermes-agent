@@ -7512,14 +7512,14 @@ async def start_gateway(config: Optional[GatewayConfig] = None, replace: bool = 
                     existing_pid,
                 )
                 return False
-            except OSError:
+            except (OSError, SystemError):
                 pass  # Already gone
             # Wait up to 10 seconds for the old process to exit
             for _ in range(20):
                 try:
                     os.kill(existing_pid, 0)
                     _time.sleep(0.5)
-                except OSError:
+                except (OSError, SystemError):
                     break  # Process is gone
             else:
                 # Still alive after 10s — force kill
@@ -7530,7 +7530,7 @@ async def start_gateway(config: Optional[GatewayConfig] = None, replace: bool = 
                 try:
                     os.kill(existing_pid, signal.SIGKILL)
                     _time.sleep(0.5)
-                except OSError:
+                except (OSError, SystemError):
                     pass
             remove_pid_file()
             # Also release all scoped locks left by the old process.
