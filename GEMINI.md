@@ -95,6 +95,12 @@ graph TD
 4. **Không sử dụng mã xóa dòng `\033[K`:** Trong mã nguồn hiển thị của CLI vì sẽ gây rò rỉ ký tự lạ trên `prompt_toolkit`.
 5. **Kiểm thử đầy đủ:** Kích hoạt môi trường ảo (`venv`) trước khi chạy bất kỳ lệnh Python nào. Chạy bộ thử nghiệm `pytest` để đảm bảo code không bị lỗi trước khi hoàn tất thay đổi.
 
+### D. Nguyên tắc Tùy biến & Hạn chế Sửa đổi Core
+1. **Tuyệt đối không can thiệp trực tiếp vào mã nguồn gốc (Core Files):** Không chỉnh sửa các tệp tin cốt lõi điều khiển luồng hoạt động chính như `run_agent.py`, `cli.py`, `hermes_state.py` hoặc các logic cốt lõi trong `agent/` trừ khi có yêu cầu đặc biệt bắt buộc để vá lỗi Windows.
+2. **Mở rộng tính năng ở "vùng rìa" (Capability at the edges):**
+   - Viết các Skills, Rules tùy biến riêng trong thư mục `.agents/`.
+   - Khi viết thêm Công cụ (Tools) mới, tạo tệp tin độc lập trong thư mục `tools/` và dùng `@register` để hệ thống tự động nhận diện, tuyệt đối không chỉnh sửa registry hoặc nạp cứng ở core.
+
 ---
 
 ## 6. Trạng Thái Hiện Tại & Các Bước Tiếp Theo
