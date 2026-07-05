@@ -39,9 +39,11 @@ services:
       - HERMES_UID=1000
       - HERMES_GID=1000
       - TZ=Asia/Ho_Chi_Minh
-      # Đặt biến môi trường này nếu muốn tắt tính năng chặn binding bảo mật vào 0.0.0.0
-      # (Khuyên dùng khi có lớp Nginx bảo mật ở ngoài làm Proxy)
+      # CẢNH BÁO BẢO MẬT: Mặc định tắt xác thực để chạy dev. Nếu public lên internet,
+      # hãy cấu hình Basic Auth của Nginx hoặc sử dụng hai biến dưới đây và bỏ cờ --insecure ở entrypoint.
       - HERMES_DASHBOARD_INSECURE=1
-    # Ghi đè entrypoint để chạy trực tiếp dashboard trên cổng 0.0.0.0, bỏ qua s6-overlay giúp không bị chạy trùng bot.
-    # Thêm `--insecure` để bỏ qua xác thực OAuth nếu truy cập qua Proxy nội bộ / Nginx
+      # - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=admin
+      # - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=your_secure_password
+    # Ghi đè entrypoint để chạy trực tiếp dashboard trên cổng 0.0.0.0.
+    # Thêm `--insecure` để bỏ qua xác thực OAuth/Basic Auth nếu dùng lớp Nginx Proxy bảo mật bên ngoài.
     entrypoint: ["/opt/hermes/.venv/bin/hermes", "dashboard", "--host", "0.0.0.0", "--no-open", "--insecure"]

@@ -72,6 +72,13 @@ Bộ skill này lưu trữ kiến thức chuyên sâu về kiến trúc codebase
 Khi khởi động lại Docker Container chạy Gateway, tiến trình mới thường giữ PID 1 và bị kẹt do lock file cũ (`gateway.pid` và các file trong `locks/`) chưa kịp xóa trên thư mục dùng chung (volume mount).
 - **Giải pháp:** Thiết lập script dọn dẹp khóa tự động chạy trước khi khởi động ứng dụng chính (như khai báo trong file cấu hình docker-compose mẫu).
 
+### C. Bảo Mật Truy Cập Dashboard Trên VPS Public
+Khi cấu hình domain public truy cập vào Dashboard qua Nginx, việc sử dụng cờ `--insecure` hoặc biến môi trường `HERMES_DASHBOARD_INSECURE=1` sẽ vô hiệu hóa hoàn toàn xác thực. Điều này cho phép bất kỳ ai cũng có thể sử dụng hệ thống của bạn miễn phí.
+- **Giải pháp 1 (Khuyên dùng):** Sử dụng Basic Authentication của Nginx bằng cách tạo file `.htpasswd` và cấu hình `auth_basic` trong block `location /` của tệp cấu hình Nginx.
+- **Giải pháp 2:** Cấu hình Basic Auth nội bộ của Dashboard bằng cách thêm biến môi trường `HERMES_DASHBOARD_BASIC_AUTH_USERNAME` và `HERMES_DASHBOARD_BASIC_AUTH_PASSWORD` vào `docker-compose.yml`, đồng thời loại bỏ cờ `--insecure` khỏi entrypoint.
+- **Giải pháp 3:** Giới hạn binding vào loopback (`127.0.0.1`) và truy cập từ xa an toàn bằng SSH Tunnel hoặc VPN (Tailscale).
+
+
 ---
 
 ## 4. Xử Lý Sự Cố Thường Gặp (Troubleshooting)
